@@ -1,49 +1,54 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collections;
+import java.util.*;
 
 class PEClothSolution {
-    private int answer = 0;
+
+    private int answer;
+    private int n;
     private List<Integer> lostList;
     private List<Integer> reserveList;
-
-    private List<Integer> arrayToList(int[] array) {
-        List<Integer> newIntegerList = new ArrayList<Integer>();
-        for (int element : array) {
-            newIntegerList.add(element);
-        }
-        return newIntegerList;
-    }
+    private Map<Integer, Integer> clothesMap;
 
     private int searchList(List<Integer> list, int element) {
         return Collections.binarySearch(list, element);
     }
 
-    private boolean removeElementIfExist(List<Integer> list, int element) {
-        int index = searchList(list, element);
-        if (index >= 0) {
-            list.remove(index);
-            this.answer++;
-            return true;
-        } else {
-            return false;
+    private void initializeArrayToMap() {
+        this.clothesMap = new HashMap<>();
+        for (int i = 1; i <= this.n; i++) {
+            int clothes = 1;
+            this.clothesMap.put(i, clothes);
+            if (searchList(this.lostList, i) >= 0) {
+                clothes -= 1;
+                this.clothesMap.put(i, clothes);
+            }
+            if (searchList(this.reserveList, i) >= 0) {
+                clothes += 1;
+                this.clothesMap.put(i, clothes);
+            }
+        }
+    }
+
+    private void calculate_cases() {
+        for (int i = 1; i <= this.n; i++) {
+            if (searchList(this.lostList, i) >= 0) {
+                if (searchList(this.reserveList, i) >= 0) {
+                    answer += 1;
+                } else if (searchList(this.reserveList, i + 1) >= 0) {
+                    this.clothesMap.put(i + 1, this.clothesMap.get(i + 1) - 1);
+                } else if (searchList(this.reserveList, i - 1) >= 0) {
+                    this.clothesMap.put(i - 1, this.clothesMap.get(i - 1) - 1);
+                } else 
+            }
         }
     }
 
     public int solution(int n, int[] lost, int[] reserve) {
-        this.lostList = arrayToList(lost);
-        this.reserveList = arrayToList(reserve);
-        for (int studentNumber = 1; studentNumber <= n; studentNumber++) {
-            int index;
-            if ((index = searchList(this.lostList, studentNumber)) >= 0) {
-                boolean ret = removeElementIfExist(this.reserveList, studentNumber) ||
-                        removeElementIfExist(this.reserveList, studentNumber + 1) ||
-                        removeElementIfExist(this.reserveList, studentNumber - 1);
-
-            } else {
-                this.answer++;
-            }
-        }
+        this.answer = 0;
+        this.n = n;
+        this.lostList = Arrays.stream(lost).boxed().toList();
+        this.reserveList = Arrays.stream(reserve).boxed().toList();
+        initializeArrayToMap();
+        calculate_cases();
         return this.answer;
     }
 }
